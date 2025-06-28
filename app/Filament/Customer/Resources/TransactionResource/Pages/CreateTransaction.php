@@ -40,17 +40,10 @@ class CreateTransaction extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Tetap log di sini untuk jaga-jaga
         Log::info('mutateFormDataBeforeCreate - Data awal:', $data);
-
-        // Tambahkan customer_id
         $data['customer_id'] = auth()->guard('customer')->id();
-
-        // Tidak menghitung total_price di sini karena data item tidak masuk ke sini
         $data['total_price'] = 0;
-
         Log::info('mutateFormDataBeforeCreate - Data final:', $data);
-
         return $data;
     }
 
@@ -58,14 +51,11 @@ class CreateTransaction extends CreateRecord
     {
         $formState = $this->form->getRawState();
         Log::info('handleRecordCreation - Form State Lengkap:', $formState);
-
         $customerId = $data['customer_id'] ?? auth()->guard('customer')->id();
         $status = $data['status'] ?? 'draft';
         $productId = $formState['product_id'] ?? null;
         $quantity = $formState['quantity'] ?? null;
         $price = $formState['price'] ?? null;
-
-        // Hitung total jika data lengkap
         $totalPrice = 0;
         if ($quantity && $price) {
             $totalPrice = $quantity * $price;
@@ -76,15 +66,12 @@ class CreateTransaction extends CreateRecord
             'status' => $status,
             'total_price' => $totalPrice,
         ]);
-
-        // Buat record transaksi
         $record = static::getModel()::create([
             'customer_id' => $customerId,
             'status' => $status,
             'total_price' => $totalPrice,
         ]);
 
-        // Cek dan simpan item produk jika data lengkap
         if ($productId && $quantity && $price) {
             $record->transactionItems()->create([
                 'product_id' => $productId,

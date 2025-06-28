@@ -9,6 +9,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProductResource extends Resource
 {
@@ -16,14 +18,28 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Forms\Components\FileUpload::make('image')
+                    ->label('Gambar Produk')
+                    ->image()
+                    ->disk('public')
+                    ->directory('products')
+                    ->nullable()
+                    ->maxSize(1024)
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Produk')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Textarea::make('description')
+                    ->label('Deskripsi')
+                    ->nullable()
+                    ->maxLength(1000),
                 Forms\Components\Select::make('category_id')
                     ->label('Kategori')
                     ->relationship('category', 'name')
@@ -49,9 +65,19 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Gambar')
+                    ->circular()
+                    ->size(50)
+                    ->default('https://via.placeholder.com/50')
+                    ->url(fn ($record) => Storage::url('' . $record->image)),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Produk')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Deskripsi')
+                    ->limit(50)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Kategori')
                     ->sortable(),

@@ -13,6 +13,8 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->foreignId('supplier_id')->constrained()->onDelete('cascade');
+            $table->text('description')->nullable();
+            $table->string('image')->nullable();
             $table->integer('price');
             $table->integer('stock');
             $table->timestamps();

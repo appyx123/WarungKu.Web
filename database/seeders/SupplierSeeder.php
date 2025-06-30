@@ -9,7 +9,6 @@ class SupplierSeeder extends Seeder
 {
     public function run(): void
     {
-        // Mengisi data supplier dunia nyata
         $suppliers = [
             [
                 'name' => 'PT Samsung Indonesia',
